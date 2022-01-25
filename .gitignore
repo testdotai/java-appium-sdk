@@ -1,6 +1,3 @@
-bin/
-build/
-
 # OS Generated files
 .DS_Store
 ._*
@@ -9,14 +6,3 @@ build/
 Icon?
 ehthumbs.db
 Thumbs.db
-
-# Eclipse
-.project
-.classpath
-.settings
-
-# Gradle
-.gradle/
-/bin/
-
-Scratch*.java
