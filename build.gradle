@@ -2,13 +2,13 @@ plugins {
     id 'java-library'
     id 'eclipse'
     id 'maven-publish'
-    // id 'signing'
+    id 'signing'
 }
 
 
 description="${project.name} build script"
 group="ai.test.sdk"
-version="0.0.1"
+version="0.0.2"
 
 
 repositories {
@@ -16,10 +16,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'io.appium:java-client:7.6.0'
-    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+    api 'com.squareup.okhttp3:okhttp:4.9.3'
+    api 'com.google.code.gson:gson:2.8.9'
+    api 'io.appium:java-client:7.6.0'
+    api 'org.seleniumhq.selenium:selenium-java:3.141.59'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
 }
@@ -38,7 +38,7 @@ javadoc {
     classpath = configurations.compileClasspath
 
     options {
-        setOutputLevel JavadocOutputLevel.VERBOSE
+        //setOutputLevel JavadocOutputLevel.VERBOSE
         setMemberLevel JavadocMemberLevel.PUBLIC
         setAuthor true
         
@@ -56,7 +56,7 @@ publishing {
             from components.java
 
             pom {
-                name = 'appium-java'
+                name = 'test-ai-appium'
                 description = 'Testing with appium enhanced by Test.ai'
                 inceptionYear = '2021'
                 url = 'https://github.com/testdotai/java-appium-sdk'
@@ -82,22 +82,22 @@ publishing {
         }
     }
 
-    // repositories {
-    //     maven {
-    //         url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    repositories {
+        maven {
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 
-    //         credentials {
-    //             username hasProperty("ossrhUsername") ? "$ossrhUsername" : System.getenv('ossrhUsername')
-    //             password hasProperty("ossrhPassword") ? "$ossrhPassword" : System.getenv('ossrhPassword')
-    //         }
-    //     }
-    // }
+            credentials {
+                username project.hasProperty("ossrhUsername") ? project.properties["ossrhUsername"] : System.getenv('ossrhUsername')
+                password project.hasProperty("ossrhPassword") ? project.properties["ossrhPassword"] : System.getenv('ossrhPassword')
+            }
+        }
+    }
 }
 
 
-// signing {
-//     sign publishing.publications.mavenJava
-// }
+signing {
+    sign publishing.publications.mavenJava
+}
 
 
 tasks.named('test') {

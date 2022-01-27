@@ -477,8 +477,8 @@ public class TestAiDriver<T>
 		}
 		catch (Throwable x)
 		{
-			System.err.printf("GOT INTO THE CATCH FOR ELEMENT BY %s%n", shortcode);
-			x.printStackTrace();
+//			System.err.printf("GOT INTO THE CATCH FOR ELEMENT BY %s%n", shortcode);
+//			x.printStackTrace();
 
 			ClassifyResult result = classify(elementName);
 			if (result.e != null)
