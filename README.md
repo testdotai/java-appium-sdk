@@ -1,15 +1,15 @@
-[![JDK-11+](https://testdotai.github.io/static-assets/logo-sdk.png)](https://adoptium.net)
+[![test.ai sdk logo](https://testdotai.github.io/static-assets/logo-sdk.png)](https://adoptium.net)
 
 [![JDK-11+](https://img.shields.io/badge/JDK-11%2B-blue)](https://adoptium.net)
 [![Apache 2.0](https://img.shields.io/badge/Apache-2.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 
-The test.ai SDK is a seamless and painless way to AI-ify your Appium test cases by leveraging AI (specifically computer vision).
+The test.ai Appium SDK is a simple library that makes it easy to write robust cross-platform mobile application tests backed by computer vision and artificial intelligence.
 
-It will automatically ingest your data (screenshots and element names) as your run the test cases for the first time. After that the AI will act as back up when the selectors are broken and try to visually identify elements.
+test.ai integrates seamelessly with your existing tests, and will act as backup if your selectors break/fail by attempting to visually (computer vision) identify elements.  This ability can also be leveraged to to write a single test suite that works on both iOS & Android.
 
-Simply put, the test.ai SDK can help you create cross-platform test cases that work for both iOS and Android with the same elements.  No more breaking tests!
+The test.ai SDK is able to accomplish this by automatically ingesting your Appium elements (using both screenshots and element names) when you run your test cases with test.ai for the first time. 
 
-The SDK also comes with a built-in editor to help you build test cases visually, so you can draw boxes around your elements instead of using fragile CSS or XPath selectors.
+The SDK is accompanied by a [web-based editor](https://sdk.test.ai/) which makes building visual test cases easy; you can draw boxes around your elements instead of using fragile CSS or XPath selectors.
 
 ## Install
 
@@ -30,9 +30,7 @@ implementation 'ai.test.sdk:test-ai-appium:0.0.2'
 ```
 
 ## Tutorial
-We have a great step-by-step tutorial which will help you get set up with the SDK so you can hit the ground running with the test.ai sdk!
-
-Check it out: https://github.com/testdotai/java-appium-sdk-demo
+We have a detailed step-by-step tutorial which will help you get set up with the SDK: https://github.com/testdotai/java-appium-sdk-demo
 
 ## Resources
 * [API Docs](https://testdotai.github.io/java-appium-sdk/)
