@@ -2,6 +2,8 @@
 
 [![JDK-11+](https://img.shields.io/badge/JDK-11%2B-blue)](https://adoptium.net)
 [![Apache 2.0](https://img.shields.io/badge/Apache-2.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
+[![javadoc](https://javadoc.io/badge2/ai.test.sdk/test-ai-appium/javadoc.svg)](https://javadoc.io/doc/ai.test.sdk/test-ai-appium)
+[![Discord](https://img.shields.io/discord/853669216880295946?&logo=discord)](https://sdk.test.ai/discord)
 
 The test.ai Appium SDK is a simple library that makes it easy to write robust cross-platform mobile application tests backed by computer vision and artificial intelligence.
 
@@ -33,5 +35,6 @@ implementation 'ai.test.sdk:test-ai-appium:0.0.2'
 We have a detailed step-by-step tutorial which will help you get set up with the SDK: https://github.com/testdotai/java-appium-sdk-demo
 
 ## Resources
-* [API Docs](https://testdotai.github.io/java-appium-sdk/)
+* [Register/Login to your test.ai account](https://sdk.test.ai/login)
+* [API Docs](https://www.javadoc.io/doc/ai.test.sdk/test-ai-appium)
 * [Another Tutorial](https://sdk.test.ai/tutorial)

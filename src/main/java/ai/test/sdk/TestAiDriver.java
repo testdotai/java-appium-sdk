@@ -75,7 +75,7 @@ public class TestAiDriver<T>
 	/**
 	 * The UUID of the last screenshot in live/interactive mode.
 	 */
-	private String lastTestCaseScreenshotUUID;
+//	private String lastTestCaseScreenshotUUID;
 
 	/**
 	 * The screen density multiplier
@@ -86,8 +86,8 @@ public class TestAiDriver<T>
 	 * Constructor, creates a new TestAiDriver.
 	 * 
 	 * @param driver The AppiumDriver to wrap
-	 * @param apiKey Your API key, acquired from {@code sdk.test.ai}.
-	 * @param serverURL The server URL. Set {@code null} to use the default of {@code sdk.test.ai}.
+	 * @param apiKey Your API key, acquired from <a href="https://sdk.test.ai">sdk.test.ai</a>.
+	 * @param serverURL The server URL. Set {@code null} to use the default of <a href="https://sdk.test.ai">sdk.test.ai</a>.
 	 * @param testCaseName The test case name to use for interactive mode. Setting this to something other than {@code null} enables interactive mode.
 	 * @param train Set `true` to enable training for each encountered element.
 	 * @throws IOException If there was an initialization error.
@@ -106,10 +106,10 @@ public class TestAiDriver<T>
 	}
 
 	/**
-	 * Constructor, creates a new TestAiDriver with the default server url, non-interactive mode, and with training enabled.
+	 * Constructor, creates a new TestAiDriver with the default server url (<a href="https://sdk.test.ai">sdk.test.ai</a>), non-interactive mode, and with training enabled.
 	 * 
 	 * @param driver The AppiumDriver to wrap
-	 * @param apiKey Your API key, acquired from {@code sdk.test.ai}.
+	 * @param apiKey Your API key, acquired from <a href="https://sdk.test.ai">sdk.test.ai</a>.
 	 * @throws IOException If there was an initialization error.
 	 */
 	public TestAiDriver(AppiumDriver<MobileElement> driver, String apiKey) throws IOException
@@ -121,10 +121,12 @@ public class TestAiDriver<T>
 	 * Convenience method, implicitly wait for the specified amount of time.
 	 * 
 	 * @param waitTime The number of seconds to implicitly wait.
+	 * @return This {@code TestAiDriver}, for chaining convenience.
 	 */
-	public void implicitlyWait(long waitTime)
+	public TestAiDriver<T> implicitlyWait(long waitTime)
 	{
 		driver.manage().timeouts().implicitlyWait(waitTime, TimeUnit.SECONDS);
+		return this;
 	}
 
 	/**
