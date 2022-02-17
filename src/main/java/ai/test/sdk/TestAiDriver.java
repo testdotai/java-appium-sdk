@@ -1,9 +1,6 @@
 package ai.test.sdk;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -75,7 +72,7 @@ public class TestAiDriver<T>
 	/**
 	 * The UUID of the last screenshot in live/interactive mode.
 	 */
-//	private String lastTestCaseScreenshotUUID;
+	// private String lastTestCaseScreenshotUUID;
 
 	/**
 	 * The screen density multiplier
@@ -479,8 +476,8 @@ public class TestAiDriver<T>
 		}
 		catch (Throwable x)
 		{
-//			System.err.printf("GOT INTO THE CATCH FOR ELEMENT BY %s%n", shortcode);
-//			x.printStackTrace();
+			// System.err.printf("GOT INTO THE CATCH FOR ELEMENT BY %s%n", shortcode);
+			// x.printStackTrace();
 
 			ClassifyResult result = classify(elementName);
 			if (result.e != null)
@@ -537,7 +534,7 @@ public class TestAiDriver<T>
 		try
 		{
 			String screenshotBase64 = driver.getScreenshotAs(OutputType.BASE64);
-			Files.write(Paths.get("/tmp/scnshot.png"), Base64.getMimeDecoder().decode(screenshotBase64));
+			// Files.write(Paths.get("/tmp/scnshot.png"), Base64.getMimeDecoder().decode(screenshotBase64));
 
 			JsonObject r = JsonUtils.responseAsJson(NetUtils.basicPOST(client, serverURL, "classify",
 					CollectionUtils.keyValuesToHM("screenshot", screenshotBase64, "source", pageSource, "api_key", apiKey, "label", elementName, "run_id", runID)));
