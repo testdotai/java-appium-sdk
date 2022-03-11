@@ -1,19 +1,43 @@
 package ai.test.sdk;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.DeviceRotation;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.ScreenOrientation;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.Navigation;
+import org.openqa.selenium.WebDriver.Options;
+import org.openqa.selenium.WebDriver.TargetLocator;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.Location;
+import org.openqa.selenium.interactions.Keyboard;
+import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.ErrorHandler;
+import org.openqa.selenium.remote.ExecuteMethod;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.SessionId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -23,8 +47,6 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-// public class TestAiDriver<T extends WebElement> extends AppiumDriver<T>
-
 /**
  * A convenient wrapper around {@code AppiumDriver} which calls out to Test.ai to improve the accuracy of identified elements.
  * 
@@ -32,8 +54,14 @@ import okhttp3.Response;
  *
  * @param <T> The element type to return, must be a subclass of MobileElement.
  */
-public class TestAiDriver<T>
+@SuppressWarnings({ "unchecked", "deprecation" })
+public class TestAiDriver<T extends WebElement> // extends AppiumDriver<T>
 {
+	/**
+	 * The logger for this class
+	 */
+	private static Logger log = LoggerFactory.getLogger(TestAiDriver.class);
+
 	/**
 	 * The client to use for making http requests
 	 */
@@ -42,7 +70,7 @@ public class TestAiDriver<T>
 	/**
 	 * The driver used by the user that we're wrapping.
 	 */
-	private AppiumDriver<MobileElement> driver;
+	private AppiumDriver<T> driver;
 
 	/**
 	 * The user's fluffy dragon API key
@@ -89,8 +117,10 @@ public class TestAiDriver<T>
 	 * @param train Set `true` to enable training for each encountered element.
 	 * @throws IOException If there was an initialization error.
 	 */
-	public TestAiDriver(AppiumDriver<MobileElement> driver, String apiKey, String serverURL, String testCaseName, boolean train) throws IOException
+	public TestAiDriver(AppiumDriver<T> driver, String apiKey, String serverURL, String testCaseName, boolean train) throws IOException
 	{
+		// super(driver.getCapabilities());
+
 		this.driver = driver;
 		this.apiKey = apiKey;
 		this.testCaseName = testCaseName;
@@ -100,6 +130,8 @@ public class TestAiDriver<T>
 		client = this.serverURL.equals(HttpUrl.parse("https://sdk.dev.test.ai")) ? NetUtils.unsafeClient() : NetUtils.basicClient().build();
 
 		multiplier = 1.0 * ImageIO.read(driver.getScreenshotAs(OutputType.FILE)).getWidth() / driver.manage().window().getSize().width;
+
+		log.debug("The screen multiplier is {}", multiplier);
 	}
 
 	/**
@@ -109,7 +141,7 @@ public class TestAiDriver<T>
 	 * @param apiKey Your API key, acquired from <a href="https://sdk.test.ai">sdk.test.ai</a>.
 	 * @throws IOException If there was an initialization error.
 	 */
-	public TestAiDriver(AppiumDriver<MobileElement> driver, String apiKey) throws IOException
+	public TestAiDriver(AppiumDriver<T> driver, String apiKey) throws IOException
 	{
 		this(driver, apiKey, null, null, true);
 	}
@@ -126,6 +158,216 @@ public class TestAiDriver<T>
 		return this;
 	}
 
+	public WebDriver context(String name)
+	{
+		return driver.context(name);
+	}
+
+	public org.openqa.selenium.remote.Response execute(String command)
+	{
+		return driver.execute(command);
+	}
+
+	public org.openqa.selenium.remote.Response execute(String command, Map<String, ?> parameters)
+	{
+		return driver.execute(command, parameters);
+	}
+
+	public T findElement(By locator)
+	{
+		return driver.findElement(locator);
+	}
+
+	public T findElement(String by, String using)
+	{
+		return driver.findElement(by, using);
+	}
+
+	public String getContext()
+	{
+		return driver.getContext();
+	}
+
+	public Set<String> getContextHandles()
+	{
+		return driver.getContextHandles();
+	}
+
+	public ExecuteMethod getExecuteMethod()
+	{
+		return driver.getExecuteMethod();
+	}
+
+	public ScreenOrientation getOrientation()
+	{
+		return driver.getOrientation();
+	}
+
+	public URL getRemoteAddress()
+	{
+		return driver.getRemoteAddress();
+	}
+
+	public Map<String, Object> getStatus()
+	{
+		return driver.getStatus();
+	}
+
+	public boolean isBrowser()
+	{
+		return driver.isBrowser();
+	}
+
+	public Location location()
+	{
+		return driver.location();
+	}
+
+	public void rotate(DeviceRotation rotation)
+	{
+		driver.rotate(rotation);
+	}
+
+	public void rotate(ScreenOrientation orientation)
+	{
+		driver.rotate(orientation);
+	}
+
+	public DeviceRotation rotation()
+	{
+		return driver.rotation();
+	}
+
+	public void setLocation(Location location)
+	{
+		driver.setLocation(location);
+	}
+
+	public String toString()
+	{
+		return driver.toString();
+	}
+
+	public Object executeAsyncScript(String script, Object... args)
+	{
+		return driver.executeAsyncScript(script, args);
+	}
+
+	public Object executeScript(String script, Object... args)
+	{
+		return driver.executeScript(script, args);
+	}
+
+	public Capabilities getCapabilities()
+	{
+		return driver.getCapabilities();
+	}
+
+	public CommandExecutor getCommandExecutor()
+	{
+		return driver.getCommandExecutor();
+	}
+
+	public String getCurrentUrl()
+	{
+		return driver.getCurrentUrl();
+	}
+
+	public ErrorHandler getErrorHandler()
+	{
+		return driver.getErrorHandler();
+	}
+
+	public FileDetector getFileDetector()
+	{
+		return driver.getFileDetector();
+	}
+
+	public Keyboard getKeyboard()
+	{
+		return driver.getKeyboard();
+	}
+
+	public Mouse getMouse()
+	{
+		return driver.getMouse();
+	}
+
+	public String getPageSource()
+	{
+		return driver.getPageSource();
+	}
+
+	public <X> X getScreenshotAs(OutputType<X> outputType)
+	{
+		return driver.getScreenshotAs(outputType);
+	}
+
+	public SessionId getSessionId()
+	{
+		return driver.getSessionId();
+	}
+
+	public String getTitle()
+	{
+		return driver.getTitle();
+	}
+
+	public String getWindowHandle()
+	{
+		return driver.getWindowHandle();
+	}
+
+	public Set<String> getWindowHandles()
+	{
+		return driver.getWindowHandles();
+	}
+
+	public Options manage()
+	{
+		return driver.manage();
+	}
+
+	public Navigation navigate()
+	{
+		return driver.navigate();
+	}
+
+	public void perform(Collection<Sequence> actions)
+	{
+		driver.perform(actions);
+	}
+
+	public void quit()
+	{
+		driver.quit();
+	}
+
+	public void resetInputState()
+	{
+		driver.resetInputState();
+	}
+
+	public void setErrorHandler(ErrorHandler handler)
+	{
+		driver.setErrorHandler(handler);
+	}
+
+	public void setFileDetector(FileDetector detector)
+	{
+		driver.setFileDetector(detector);
+	}
+
+	public void setLogLevel(Level level)
+	{
+		driver.setLogLevel(level);
+	}
+
+	public TargetLocator switchTo()
+	{
+		return driver.switchTo();
+	}
+
 	/**
 	 * Attempts to find an element by accessibility id.
 	 * 
@@ -133,7 +375,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByAccessibilityId(String using, String elementName)
+	public T findElementByAccessibilityId(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "accessibility_id", driver::findElementByAccessibilityId);
 	}
@@ -144,7 +386,7 @@ public class TestAiDriver<T>
 	 * @param using The accessibility id of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByAccessibilityId(String using)
+	public T findElementByAccessibilityId(String using)
 	{
 		return findElementByAccessibilityId(using, null);
 	}
@@ -155,7 +397,7 @@ public class TestAiDriver<T>
 	 * @param using The accessibility id of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByAccessibilityId(String using)
+	public List<T> findElementsByAccessibilityId(String using)
 	{
 		return driver.findElementsByAccessibilityId(using);
 	}
@@ -167,7 +409,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByClassName(String using, String elementName)
+	public T findElementByClassName(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "class_name", driver::findElementByClassName);
 	}
@@ -178,7 +420,7 @@ public class TestAiDriver<T>
 	 * @param using The class name of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByClassName(String using)
+	public T findElementByClassName(String using)
 	{
 		return findElementByClassName(using, null);
 	}
@@ -189,7 +431,7 @@ public class TestAiDriver<T>
 	 * @param using The class name of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByClassName(String using)
+	public List findElementsByClassName(String using)
 	{
 		return driver.findElementsByClassName(using);
 	}
@@ -201,7 +443,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByCssSelector(String using, String elementName)
+	public T findElementByCssSelector(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "class_name", driver::findElementByCssSelector);
 	}
@@ -212,7 +454,7 @@ public class TestAiDriver<T>
 	 * @param using The css selector of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByCssSelector(String using)
+	public T findElementByCssSelector(String using)
 	{
 		return findElementByCssSelector(using, null);
 	}
@@ -223,7 +465,7 @@ public class TestAiDriver<T>
 	 * @param using The css selector of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByCssSelector(String using)
+	public List findElementsByCssSelector(String using)
 	{
 		return driver.findElementsByCssSelector(using);
 	}
@@ -235,7 +477,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementById(String using, String elementName)
+	public T findElementById(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "class_name", driver::findElementById);
 	}
@@ -246,7 +488,7 @@ public class TestAiDriver<T>
 	 * @param using The id of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementById(String using)
+	public T findElementById(String using)
 	{
 		return findElementById(using, null);
 	}
@@ -257,7 +499,7 @@ public class TestAiDriver<T>
 	 * @param using The id of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsById(String using)
+	public List findElementsById(String using)
 	{
 		return driver.findElementsById(using);
 	}
@@ -269,7 +511,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByLinkText(String using, String elementName)
+	public T findElementByLinkText(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "class_name", driver::findElementByLinkText);
 	}
@@ -280,7 +522,7 @@ public class TestAiDriver<T>
 	 * @param using The link text of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByLinkText(String using)
+	public T findElementByLinkText(String using)
 	{
 		return findElementByLinkText(using, null);
 	}
@@ -291,7 +533,7 @@ public class TestAiDriver<T>
 	 * @param using The link text of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByLinkText(String using)
+	public List findElementsByLinkText(String using)
 	{
 		return driver.findElementsByLinkText(using);
 	}
@@ -303,7 +545,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByName(String using, String elementName)
+	public T findElementByName(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "name", driver::findElementByName);
 	}
@@ -314,7 +556,7 @@ public class TestAiDriver<T>
 	 * @param using The name of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByName(String using)
+	public T findElementByName(String using)
 	{
 		return findElementByName(using, null);
 	}
@@ -325,7 +567,7 @@ public class TestAiDriver<T>
 	 * @param using The name of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByName(String using)
+	public List findElementsByName(String using)
 	{
 		return driver.findElementsByName(using);
 	}
@@ -337,7 +579,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByPartialLinkText(String using, String elementName)
+	public T findElementByPartialLinkText(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "name", driver::findElementByPartialLinkText);
 	}
@@ -348,7 +590,7 @@ public class TestAiDriver<T>
 	 * @param using The partial link text of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByPartialLinkText(String using)
+	public T findElementByPartialLinkText(String using)
 	{
 		return findElementByPartialLinkText(using, null);
 	}
@@ -359,7 +601,7 @@ public class TestAiDriver<T>
 	 * @param using The partial link text of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByPartialLinkText(String using)
+	public List findElementsByPartialLinkText(String using)
 	{
 		return driver.findElementsByPartialLinkText(using);
 	}
@@ -371,7 +613,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByTagName(String using, String elementName)
+	public T findElementByTagName(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "name", driver::findElementByTagName);
 	}
@@ -382,7 +624,7 @@ public class TestAiDriver<T>
 	 * @param using The tag name of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByTagName(String using)
+	public T findElementByTagName(String using)
 	{
 		return findElementByTagName(using, null);
 	}
@@ -393,7 +635,7 @@ public class TestAiDriver<T>
 	 * @param using The tag name of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByTagName(String using)
+	public List findElementsByTagName(String using)
 	{
 		return driver.findElementsByTagName(using);
 	}
@@ -405,7 +647,7 @@ public class TestAiDriver<T>
 	 * @param elementName The label name of the element to be classified. Optional, set {@code null} to auto generate an element name.
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByXPath(String using, String elementName)
+	public T findElementByXPath(String using, String elementName)
 	{
 		return findElementByGeneric(using, elementName, "xpath", driver::findElementByXPath);
 	}
@@ -416,7 +658,7 @@ public class TestAiDriver<T>
 	 * @param using The xpath of the element to find
 	 * @return The element that was found. Raises an exception otherwise.
 	 */
-	public MobileElement findElementByXPath(String using)
+	public T findElementByXPath(String using)
 	{
 		return findElementByXPath(using, null);
 	}
@@ -427,7 +669,7 @@ public class TestAiDriver<T>
 	 * @param using The xpath of the elements to find.
 	 * @return A {@code List} with any elements that were found, or an empty {@code List} if no matches were found.
 	 */
-	public List<MobileElement> findElementsByXPath(String using)
+	public List findElementsByXPath(String using)
 	{
 		return driver.findElementsByXPath(using);
 	}
@@ -456,7 +698,7 @@ public class TestAiDriver<T>
 	 * @param fn The appium function to call with {@code using}, which will be used to fetch what Appium thinks is the target element.
 	 * @return The TestAiElement
 	 */
-	private MobileElement findElementByGeneric(String using, String elementName, String shortcode, Function<String, MobileElement> fn)
+	private T findElementByGeneric(String using, String elementName, String shortcode, Function<String, T> fn)
 	{
 		if (elementName == null)
 			elementName = String.format("element_name_by_%s_%s", shortcode, using.replace('.', '_'));
@@ -465,7 +707,7 @@ public class TestAiDriver<T>
 
 		try
 		{
-			MobileElement driverElement = fn.apply(using);
+			T driverElement = fn.apply(using);
 			if (driverElement != null)
 			{
 				ClassifyResult result = classify(elementName);
@@ -476,12 +718,13 @@ public class TestAiDriver<T>
 		}
 		catch (Throwable x)
 		{
-			// System.err.printf("GOT INTO THE CATCH FOR ELEMENT BY %s%n", shortcode);
-			// x.printStackTrace();
+			log.info("Element '{}' was not found by Appium, trying with test.ai...", elementName);
 
 			ClassifyResult result = classify(elementName);
 			if (result.e != null)
-				return result.e;
+				return (T) result.e;
+
+			log.error("test.ai was also unable to find the element with name '{}'", elementName);
 
 			throw x;
 		}
@@ -495,9 +738,9 @@ public class TestAiDriver<T>
 	 * @param elementName The name associated with this element
 	 * @param trainIfNecessary Set {@code true} if the model on the server should also be trained with this element.
 	 */
-	private void updateElement(RemoteWebElement elem, String key, String elementName, boolean trainIfNecessary)
+	private void updateElement(T elem, String key, String elementName, boolean trainIfNecessary)
 	{
-		Rectangle rect = elem.getRect();
+		Rectangle rect = ((MobileElement) elem).getRect();
 		HashMap<String, String> form = CollectionUtils.keyValuesToHM("key", key, "api_key", apiKey, "run_id", runID, "x", Integer.toString(rect.x), "y", Integer.toString(rect.y), "width",
 				Integer.toString(rect.width), "height", Integer.toString(rect.height), "multiplier", Double.toString(multiplier), "train_if_necessary", Boolean.toString(trainIfNecessary));
 
@@ -543,17 +786,30 @@ public class TestAiDriver<T>
 
 			if (JsonUtils.booleanFromJson(r, "success"))
 			{
-				System.out.printf("successful classification of element_name: %s%n", elementName);
+				log.info("Successfully classified: {}", elementName);
 				return new ClassifyResult(new TestAiElement(r.get("elem").getAsJsonObject(), driver, multiplier), key);
 			}
-			else
-				msg = String.format("Classification failed for element_name: %s - Please visit %s/label/%s to classify%n", elementName, serverURL, elementName);
+
+			String rawMsg = JsonUtils.stringFromJson(r, "message");
+			if (rawMsg != null)
+			{
+				String cFailedBase = "Classification failed for element_name: ";
+
+				if (rawMsg.contains("Please label") || rawMsg.contains("Did not find"))
+					msg = String.format("%s%s - Please visit %s/label/%s to classify", cFailedBase, elementName, serverURL, elementName);
+				else if (rawMsg.contains("frozen label"))
+					msg = String.format("%s%s - However this element is frozen, so no new screenshot was uploaded. Please unfreeze the element if you want to add this screenshot to training", cFailedBase,
+							elementName);
+				else
+					msg = String.format("%s: Unknown error, here was the API response: %s", msg, r);
+			}
 		}
 		catch (Throwable e)
 		{
 			e.printStackTrace();
 		}
 
+		log.warn(msg);
 		return new ClassifyResult(null, key, msg);
 	}
 

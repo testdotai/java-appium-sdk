@@ -10,6 +10,7 @@ import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 /**
@@ -18,6 +19,7 @@ import org.openqa.selenium.interactions.Actions;
  * @author Alexander Wu (alec@test.ai)
  *
  */
+@SuppressWarnings("unchecked")
 public class TestAiElement extends MobileElement
 {
 	/**
@@ -68,6 +70,7 @@ public class TestAiElement extends MobileElement
 	TestAiElement(JsonObject elem, @SuppressWarnings("rawtypes") AppiumDriver driver, double multiplier)
 	{
 		this.driver = driver;
+		setParent(driver);
 
 		text = JsonUtils.stringFromJson(elem, "text");
 		size = new Dimension(JsonUtils.intFromJson(elem, "width") / (int) multiplier, JsonUtils.intFromJson(elem, "height") / (int) multiplier);
@@ -144,5 +147,35 @@ public class TestAiElement extends MobileElement
 	public void submit()
 	{
 		sendKeys("\n", false);
+	}
+
+	@Override
+	public String getAttribute(String name)
+	{
+		return null;
+	}
+
+	@Override
+	public String getCssValue(String propertyName)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isDisplayed()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isEnabled()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isSelected()
+	{
+		throw new UnsupportedOperationException();
 	}
 }

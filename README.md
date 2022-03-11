@@ -22,13 +22,13 @@ Add the following line(s) to the dependencies section in your
 <dependency>
   <groupId>ai.test.sdk</groupId>
   <artifactId>test-ai-appium</artifactId>
-  <version>0.0.3</version>
+  <version>0.1.0</version>
 </dependency>
 ````
 
 **build.gradle (Gradle)**
 ```groovy
-implementation 'ai.test.sdk:test-ai-appium:0.0.3'
+implementation 'ai.test.sdk:test-ai-appium:0.1.0'
 ```
 
 ## Tutorial

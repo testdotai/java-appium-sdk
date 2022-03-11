@@ -15,6 +15,9 @@ Thumbs.db
 .classpath
 .settings
 
+# intellij
+.idea
+
 # Gradle
 .gradle/
 /bin/
